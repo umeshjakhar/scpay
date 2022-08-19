@@ -5,7 +5,34 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  
+  <script>
+    QueryBuilder.define('bt-tooltip-errors', function(options) {
+    if (!$.fn.tooltip || !$.fn.tooltip.Constructor || !$.fn.tooltip.Constructor.prototype.fixTitle) {
+        Utils.error('MissingLibrary', 'Bootstrap Tooltip is required to use "bt-tooltip-errors" plugin. Get it here: http://getbootstrap.com');
+    }
+
+    var self = this;
+
+    // add BT Tooltip data
+    this.on('getRuleTemplate.filter getGroupTemplate.filter', function(h) {
+        var $h = $(h.value);
+        $h.find(QueryBuilder.selectors.error_container).attr('data-toggle', 'tooltip');
+        h.value = $h.prop('outerHTML');
+    });
+
+    // init/refresh tooltip when title changes
+    this.model.on('update', function(e, node, field) {
+        if (field == 'error' && self.settings.display_errors) {
+            node.$el.find(QueryBuilder.selectors.error_container).eq(0)
+                .tooltip(options)
+                .tooltip('hide')
+                .tooltip('fixTitle');
+        }
+    });
+}, {
+    placement: 'right'
+});
+  </script>
 <script src="https://cdn.jsdelivr.net/npm/jQuery-QueryBuilder/dist/js/query-builder.standalone.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jQuery-QueryBuilder/dist/css/query-builder.default.min.css">
 </head>
